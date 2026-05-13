@@ -1,1 +1,27 @@
+name: Run Option Data
 
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 22 * * *'
+    - cron: '0 7 * * *'
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install packages
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run script
+        run: |
+          python Get_Option_Data.py
