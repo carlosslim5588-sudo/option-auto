@@ -7,13 +7,14 @@ on:
     - cron: '0 22 * * *'  # JST 07:00
     - cron: '0 7 * * *'   # JST 16:00
 
-concurrency:
-  group: option-data
-  cancel-in-progress: false
-
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
+    env:
+      GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+
+
 
     steps:
       - name: Checkout repository
