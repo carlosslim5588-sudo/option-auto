@@ -2,7 +2,8 @@ name: Option Data
 
 on:
   schedule:
-    - cron: "0 4 * * *"
+    - cron: "0 22 * * *"  # 🇯🇵 日本時間の 朝7:00 に自動実行
+    - cron: "0 7 * * *"   # 🇯🇵 日本時間の 夕方16:00 に自動実行
   workflow_dispatch:
 
 env:
