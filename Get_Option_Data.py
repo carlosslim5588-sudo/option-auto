@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 # --- 出力ファイル名 ---
 now_jst = datetime.utcnow() + timedelta(hours=9)
 timestamp_str = now_jst.strftime("%Y%m%d_%H%M%S")
-# GitHub Actionsの環境に合わせて保存先を設定
+# GitHubの環境で動くように保存先をシンプルに変更
 OUTPUT_FILE = f"Get_Option_Data_{timestamp_str}.xlsx"
 
 # --- Chrome起動設定 ---
@@ -115,10 +115,10 @@ finally:
     print("ブラウザ終了")
     driver.quit()
 
-# エラーの引き金になっていた関数を「何もしない関数」として上書き
+# エラーの原因になっていた関数を、エラーが出ない「何もしない関数」に書き換え
 def upload_to_drive(local_file, drive_file):
     print("Google Driveへのアップロードはスキップします（GitHubに保存されます）")
     pass
 
-# 162行目のエラー対策用呼び出し
+# 元のコードの162行目に残っている呼び出しを安全に処理
 upload_to_drive(OUTPUT_FILE, OUTPUT_FILE)
