@@ -23,7 +23,7 @@ jobs:
 
       - name: Install packages
         run: |
-          pip install selenium pandas openpyxl webdriver-manager
+          pip install selenium pandas openpyxl webdriver-manager lxml
 
       - name: Run script
         run: python Get_Option_Data.py
