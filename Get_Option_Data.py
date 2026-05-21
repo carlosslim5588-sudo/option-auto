@@ -14,7 +14,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 # --- 出力ファイル名 ---
 now_jst = datetime.utcnow() + timedelta(hours=9)
 timestamp_str = now_jst.strftime("%Y%m%d_%H%M%S")
-# GitHubの環境で動くように保存先をシンプルに変更
 OUTPUT_FILE = f"Get_Option_Data_{timestamp_str}.xlsx"
 
 # --- Chrome起動設定 ---
@@ -53,17 +52,24 @@ try:
         EC.element_to_be_clickable((By.LINK_TEXT, "オプション価格情報"))
     )
     print("🖱️ 「オプション価格情報」のリンクをクリックします。")
+    
+    # 現在のタブの数を記憶
+    old_handles_count = len(driver.window_handles)
     link.click()
 
+    # 新しいタブが完全に開くまで最大10秒待つ
+    WebDriverWait(driver, 10).until(lambda d: len(d.window_handles) > old_handles_count)
     driver.switch_to.window(driver.window_handles[-1])
     print("✅ 新しいタブに切り替えました。")
 
-    time.sleep(5)
+    # ページ全体の読み込みを10秒じっくり待つ
+    print("⏳ ページの読み込み完了を待っています...")
+    time.sleep(10)
 
     # 株価情報を取得
     try:
         print("🔍 日経平均株価と先物を取得します...")
-        prices = WebDriverWait(driver, 15).until(
+        prices = WebDriverWait(driver, 20).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "td.a-right.price-now"))
         )
         if len(prices) >= 2:
@@ -76,6 +82,12 @@ try:
         print(f"❌ 株価情報の取得失敗: {e}")
         nikkei_value = "N/A"
         futures_value = "N/A"
+
+    # データが入っているテーブル（price-table）が画面に出現するまで最大20秒待つ
+    print("🔍 オプション価格テーブルを探しています...")
+    WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "price-table"))
+    )
 
     # オプション価格テーブルを取得
     tables = driver.find_elements(By.TAG_NAME, "table")
@@ -110,15 +122,14 @@ try:
         print(f"💾 保存完了: {OUTPUT_FILE}")
     else:
         print("⚠ 保存対象のテーブルが見つかりませんでした。")
+        # ファイルが作られなかった場合はあえてエラーを出して通知する
+        raise FileNotFoundError("データテーブルの取得に失敗したため、ファイルを作成できませんでした。")
 
 finally:
     print("ブラウザ終了")
     driver.quit()
 
-# エラーの原因になっていた関数を、エラーが出ない「何もしない関数」に書き換え
 def upload_to_drive(local_file, drive_file):
-    print("Google Driveへのアップロードはスキップします（GitHubに保存されます）")
     pass
 
-# 元のコードの162行目に残っている呼び出しを安全に処理
 upload_to_drive(OUTPUT_FILE, OUTPUT_FILE)
