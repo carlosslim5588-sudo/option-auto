@@ -3,10 +3,10 @@ name: Option Data
 on:
   schedule:
     - cron: "16 21 * * *"  # 🇯🇵 日本時間の 朝6:16 に自動実行
-    - cron: "16 7 * * *"   # 🇯🇵 日本時間の 夕方16:16 に自動実行
+    - cron: "10 7 * * *"   # 🇯🇵 日本時間の 夕方16:16 に自動実行
 
     - cron: "00 7 * * *"  # 16:20 JST
-    - cron: "10 7 * * *"  # 16:40 JST
+    - cron: "05 7 * * *"  # 16:40 JST
   workflow_dispatch:
 
 env:
