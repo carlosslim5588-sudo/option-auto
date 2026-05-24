@@ -45,3 +45,4 @@ jobs:
         with:
           name: option-data
           path: Get_Option_Data_*.xlsx
+          retention-days: 90  # 90日間保存する　書いた方が安定
