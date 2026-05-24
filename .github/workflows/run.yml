@@ -3,8 +3,9 @@ name: Option Data
 on:
   schedule:
     - cron: "08 21 * * *"  # 🇯🇵 日本時間の 朝6:08 に自動実行
-    - cron: "08 7 * * *"   # 🇯🇵 日本時間の 夕方16:08 に自動実行
-
+    - cron: "01 6 * * *"   # 🇯🇵 日本時間の 夕方15:01 に自動実行
+    - cron: "08 6 * * *"  # 15:08 JST
+    - cron: "30 6 * * *"  # 15:30 JST
     - cron: "01 7 * * *"  # 16:01 JST
     - cron: "05 7 * * *"  # 16:05 JST
   workflow_dispatch:
