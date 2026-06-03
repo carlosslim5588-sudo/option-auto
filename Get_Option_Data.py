@@ -98,7 +98,7 @@ try:
     link.click()
 
     # 新タブ待機
-    WebDriverWait(driver, 20).until(
+    WebDriverWait(driver, 30).until(
         lambda d: len(d.window_handles) > old_handles_count
     )
 
@@ -167,7 +167,7 @@ try:
         futures_value = "N/A"
 
     # table取得
-    tables = WebDriverWait(driver, 30).until(
+    tables = WebDriverWait(driver, 60).until(
         lambda d: d.find_elements(
             By.CSS_SELECTOR,
             "table.price-table"
