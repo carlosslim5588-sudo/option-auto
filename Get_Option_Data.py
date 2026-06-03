@@ -117,7 +117,7 @@ try:
     print("⏳ オプションページ描画待機中...")
 
     # table生成待機
-    WebDriverWait(driver, 30).until(
+    WebDriverWait(driver, 60).until(
         lambda d: len(
             d.find_elements(
                 By.CSS_SELECTOR,
@@ -125,7 +125,8 @@ try:
             )
         ) > 30
     )
-
+    print("✅ table生成完了")
+    
     # 念のため追加待機
     time.sleep(3)
 
