@@ -117,7 +117,37 @@ try:
     print("⏳ オプションページ描画待機中...")
 
     # table生成待機
-    WebDriverWait(driver, 60).until(
+    print("現在URL =", driver.current_url)
+    print("タイトル =", driver.title)
+    print(
+        "全table数 =",
+        len(
+            driver.find_elements(
+                By.TAG_NAME,
+                "table"
+            )
+        )
+    )
+    print(
+        "price-table数 =",
+        len(
+            driver.find_elements(
+                By.CSS_SELECTOR,
+                "table.price-table"
+            )
+        )
+    )
+    driver.save_screenshot("debug.png")
+    
+    with open(
+        "debug_before_wait.html",
+        "w",
+        encoding="utf-8"
+    ) as f:
+        f.write(driver.page_source)
+    
+    # table生成待機
+    WebDriverWait(driver, 90).until(
         lambda d: len(
             d.find_elements(
                 By.CSS_SELECTOR,
@@ -125,10 +155,14 @@ try:
             )
         ) > 30
     )
+    
     print("✅ table生成完了")
     
     # 念のため追加待機
     time.sleep(3)
+
+
+
 
     # デバッグ保存（完全一致確認用）
     with open("debug_page_source.html", "w", encoding="utf-8") as f:
