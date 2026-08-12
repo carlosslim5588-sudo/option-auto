@@ -14,6 +14,6 @@ jobs:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
           retain_days: 0           # 日数での指定は無効化（0日）
-          keep_minimum_runs: 200   # ★最新の100件だけを残す
+          keep_minimum_runs: 80   # ★最新の100件だけを残す
 
           name: Delete old workflow runs
