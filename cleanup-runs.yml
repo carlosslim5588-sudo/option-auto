@@ -1,7 +1,7 @@
 name: Delete old workflow runs
 on:
   schedule:
-    - cron: '0 0 * * *' # 毎日深夜0時に自動実行
+    - cron: '0 15 * * *' # 日本時間の毎日0:00に自動実行
   workflow_dispatch: # 画面から手動で実行するボタンも表示させる
 
 jobs:
