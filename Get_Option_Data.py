@@ -2,8 +2,14 @@
 
 import time
 from io import StringIO
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pandas as pd
+import numpy as np
+import sys
+import io
+
+# UTF-8出力設定
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -14,7 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 # --- 出力ファイル名 ---
-now_jst = datetime.utcnow() + timedelta(hours=9)
+now_jst = datetime.now(timezone.utc) + timedelta(hours=9)
 timestamp_str = now_jst.strftime("%Y%m%d_%H%M%S")
 OUTPUT_FILE = f"Get_Option_Data_{timestamp_str}.xlsx"
 
@@ -230,16 +236,8 @@ try:
                     for col in df.columns.values
                 ]
 
-            # Greeks除外
-            mask = df.astype(str).apply(
-                lambda col: col.str.contains(
-                    "デルタ|ガンマ|セータ|ベガ",
-                    regex=True
-                )
-            ).any(axis=1)
-
-            df = df[~mask]
-
+            # ヘッダー行を維持（パーサーが期待する形式：ヘッダーあり）
+            # Greeksを除外しない（パーサーが期待する形式を維持）
             df_list.append(df)
 
         except Exception as e:
@@ -257,28 +255,109 @@ try:
             "%Y-%m-%d %H:%M:%S"
         )
 
-        header_row = pd.DataFrame([{
-            "日経平均株価": nikkei_value,
-            "日経225先物": futures_value,
-            "取得日時": timestamp
-        }])
-
-        final_df = pd.concat(
-            [header_row, combined_df],
-            ignore_index=True
-        )
+        # パーサーが期待する形式：ヘッダー行 + セッション情報行
+        # マニュアルファイルと同じ列順序（20列）に合わせる
+        expected_columns = [
+            '日経平均株価',
+            '日経225先物',
+            '取得日時',
+            'CALL 清算値 08/12',
+            'CALL 建玉残',
+            'CALL 取引高',
+            'CALL 売気配IV 買気配IV',
+            'CALL 売気配(数量) 買気配(数量)',
+            'CALL IV',
+            'CALL 前日比',
+            'CALL 現在値',
+            '権利行使 価格 権利行使 価格',
+            'PUT 現在値',
+            'PUT 前日比',
+            'PUT IV',
+            'PUT 売気配(数量) 買気配(数量)',
+            'PUT 売気配IV 買気配IV',
+            'PUT 取引高',
+            'PUT 建玉残',
+            'PUT 清算値 08/12'
+        ]
+        
+        # 現在の列名を取得
+        current_columns = list(combined_df.columns)
+        
+        # 列マッピングを作成（現在の列名を期待する列名にマッピング）
+        column_mapping = {}
+        for i, current_col in enumerate(current_columns):
+            if i == 0:
+                column_mapping[current_col] = '日経平均株価'
+            elif i == 1:
+                column_mapping[current_col] = '日経225先物'
+            elif i == 2:
+                column_mapping[current_col] = '取得日時'
+            elif 'CALL 清算値' in str(current_col):
+                column_mapping[current_col] = 'CALL 清算値 08/12'
+            elif 'CALL 建玉残' in str(current_col):
+                column_mapping[current_col] = 'CALL 建玉残'
+            elif 'CALL 取引高' in str(current_col):
+                column_mapping[current_col] = 'CALL 取引高'
+            elif 'CALL 売気配IV' in str(current_col):
+                column_mapping[current_col] = 'CALL 売気配IV 買気配IV'
+            elif 'CALL 売気配(数量)' in str(current_col):
+                column_mapping[current_col] = 'CALL 売気配(数量) 買気配(数量)'
+            elif 'CALL IV' in str(current_col) and '売気配' not in str(current_col):
+                column_mapping[current_col] = 'CALL IV'
+            elif 'CALL 前日比' in str(current_col):
+                column_mapping[current_col] = 'CALL 前日比'
+            elif 'CALL 現在値' in str(current_col):
+                column_mapping[current_col] = 'CALL 現在値'
+            elif '権利行使' in str(current_col):
+                column_mapping[current_col] = '権利行使 価格 権利行使 価格'
+            elif 'PUT 現在値' in str(current_col):
+                column_mapping[current_col] = 'PUT 現在値'
+            elif 'PUT 前日比' in str(current_col):
+                column_mapping[current_col] = 'PUT 前日比'
+            elif 'PUT IV' in str(current_col) and '売気配' not in str(current_col):
+                column_mapping[current_col] = 'PUT IV'
+            elif 'PUT 売気配(数量)' in str(current_col):
+                column_mapping[current_col] = 'PUT 売気配(数量) 買気配(数量)'
+            elif 'PUT 売気配IV' in str(current_col):
+                column_mapping[current_col] = 'PUT 売気配IV 買気配IV'
+            elif 'PUT 取引高' in str(current_col):
+                column_mapping[current_col] = 'PUT 取引高'
+            elif 'PUT 建玉残' in str(current_col):
+                column_mapping[current_col] = 'PUT 建玉残'
+            elif 'PUT 清算値' in str(current_col):
+                column_mapping[current_col] = 'PUT 清算値 08/12'
+        
+        # 列名を変更
+        combined_df = combined_df.rename(columns=column_mapping)
+        
+        # 欠けている列を追加（NaNで埋める）
+        for col in expected_columns:
+            if col not in combined_df.columns:
+                combined_df[col] = np.nan
+        
+        # 列順序をexpected_columnsに合わせる
+        combined_df = combined_df[expected_columns]
+        
+        # セッション情報行（列0=日経平均株価, 列1=日経225先物, 列2=タイムスタンプ）
+        session_row_data = [nikkei_value, futures_value, timestamp] + [None] * (len(expected_columns) - 3)
+        
+        # 新しいDataFrameを作成（ヘッダー行 + セッション情報行 + データ）
+        final_data = [expected_columns, session_row_data] + combined_df.values.tolist()
+        final_df = pd.DataFrame(final_data, columns=expected_columns)
 
         # 完全一致確認用CSV保存
         final_df.to_csv(
             "debug_compare.csv",
             index=False,
+            header=False,
             encoding="utf-8-sig"
         )
 
         # Excel保存
         final_df.to_excel(
             OUTPUT_FILE,
-            index=False
+            index=False,
+            header=False
         )
 
         print(f"💾 保存完了: {OUTPUT_FILE}")
