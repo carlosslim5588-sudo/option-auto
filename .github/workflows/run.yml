@@ -10,14 +10,16 @@ on:
 # =========================
 # 夕方データ（16:00 JST（= 07:00 UTC）狙い → 遅延+2h吸収）
 # =========================
-    - cron: "38 1 * * *"  # 10:38 JST
-    - cron: "08 2 * * *"  # 11:08 JST
-    - cron: "08 3 * * *"  # 12:08 JST
-    - cron: "08 4 * * *"  # 13:08 JST
-    - cron: "08 5 * * *"  # 14:08 JST
-    - cron: "08 6 * * *"  # 15:08 JST
-    
-    - cron: "08 7 * * *"  # 🇯🇵 日本時間の 夕方16:08 に自動実行
+    - cron: "08 22 * * *"  # 7:08 JST
+    - cron: "08 23 * * *"  # 8:08 JST  （※24ではなく23です）
+    - cron: "08 0 * * *"   # 9:08 JST
+    - cron: "08 1 * * *"   # 10:08 JST
+    - cron: "08 2 * * *"   # 11:08 JST
+    - cron: "08 3 * * *"   # 12:08 JST
+    - cron: "08 4 * * *"   # 13:08 JST
+    - cron: "08 5 * * *"   # 14:08 JST
+    - cron: "08 6 * * *"   # 15:08 JST
+    - cron: "08 7 * * *"   # 🇯🇵 日本時間の 夕方16:08 に自動実行
 
   workflow_dispatch:
 
@@ -30,10 +32,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5  # ★v4 から v5 に変更
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6  # ★v5 から v6 に変更
         with:
           python-version: "3.11"
 
@@ -45,8 +47,8 @@ jobs:
         run: python Get_Option_Data.py
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5  # ★v4 から v5 に変更
         with:
           name: option-data
           path: Get_Option_Data_*.xlsx
-          retention-days: 90  # 90日間保存する　書いた方が安定
+          retention-days: 90  # 90日間保存する 書いた方が安定
