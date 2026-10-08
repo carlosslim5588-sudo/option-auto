@@ -1,5 +1,5 @@
-# --- 2026/8/13 ---　　PC版（CSV複数_DB前処理Tool.py）と完全一致のDATAが得られること確認済み。https://github.com/　版は取得できない場合の待機時間を設けていることのみ違う。　　
-# ここを変更して　期限を延ばす！！　2026/8/30
+# --- 2026/10/8 ---　　PC版（CSV複数_DB前処理Tool.py）と完全一致のDATAが得られること確認済み。https://github.com/　版は取得できない場合の待機時間を設けていることのみ違う。　　
+# ここを変更して　期限を延ばす！！　2026/10/8
 
 import time
 from io import StringIO
@@ -15,7 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-
+import io
 # --- 出力ファイル名 ---
 now_jst = datetime.now(timezone.utc) + timedelta(hours=9)
 timestamp_str = now_jst.strftime("%Y%m%d_%H%M%S")
