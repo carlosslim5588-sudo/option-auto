@@ -15,7 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-import io
+
 # --- 出力ファイル名 ---
 now_jst = datetime.now(timezone.utc) + timedelta(hours=9)
 timestamp_str = now_jst.strftime("%Y%m%d_%H%M%S")
