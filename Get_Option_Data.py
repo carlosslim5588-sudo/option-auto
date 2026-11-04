@@ -1,6 +1,7 @@
 # --- 2026/10/8 ---　　PC版（CSV複数_DB前処理Tool.py）と完全一致のDATAが得られること確認済み。https://github.com/　版は取得できない場合の待機時間を設けていることのみ違う。　　
 # ここを変更して　期限を延ばす！！　2026/10/8
 
+inport time
 import time
 from io import StringIO
 from datetime import datetime, timedelta, timezone
